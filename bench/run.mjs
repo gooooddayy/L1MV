@@ -79,6 +79,12 @@ for (let i = 0; i < 60; i++) {
   await sleep(300);
 }
 
+// 注入测试夹具（产物里已无内置示例）：先加载 seed.js，探针里用 __seedDemo(A)
+try {
+  const seed = readFileSync(new URL('./seed.js', import.meta.url), 'utf8');
+  await send('Runtime.evaluate', { expression: seed, returnByValue: true });
+} catch (e) { console.log('seed skipped:', e.message); }
+
 const expr = readFileSync(exprFile, 'utf8');
 const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true, timeout: 300000 });
 if (r.result && r.result.exceptionDetails) console.log('ERR', JSON.stringify(r.result.exceptionDetails, null, 2));

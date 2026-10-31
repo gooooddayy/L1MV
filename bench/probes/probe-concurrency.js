@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, st = A.state, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 400));
 
   // 拦下载：只记次数

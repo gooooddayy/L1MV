@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, out = {};
-  A.loadDemo(); await new Promise(r => setTimeout(r, 300));
+  __seedDemo(A); await new Promise(r => setTimeout(r, 300));
 
   // 让 AAC 真的编不出来（configure 直接抛），但其他编码器正常
   const RealAE = window.AudioEncoder;

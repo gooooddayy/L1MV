@@ -9,7 +9,7 @@
 
   // 单独量一次「示例」按钮与一次真实封面导入
   const t0 = performance.now();
-  window.__app.loadDemo();
+  __seedDemo(window.__app);
   out.demoMs = Math.round(performance.now() - t0);
 
   const t1 = performance.now();

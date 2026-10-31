@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, st = A.state, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 600));
   out.deviceMemory = navigator.deviceMemory || null;
   out.cores = navigator.hardwareConcurrency || null;

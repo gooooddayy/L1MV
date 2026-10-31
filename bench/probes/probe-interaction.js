@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 400));
 
   // 1) 模拟拖动字号滑块：连发 60 个 input 事件，量「同步阻塞」多久

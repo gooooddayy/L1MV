@@ -840,7 +840,7 @@ function setStatus(msg, kind){
    ② 日志：环形容器（最近 200 条）。导出时往 console 打日志是纯负担（每行都要序列化
       + 走管道），但真出问题又要能看到现场，所以只留在内存里，需要时一键导出。
    ③ 可见性：预览在屏幕外时不再逐帧重绘（手机上翻到「样式」页，预览还在跑 rAF）。 */
-const IS_DEBUG = /(?:^|[?&])(?:demo|debug)=/.test(location.search);
+const IS_DEBUG = /(?:^|[?&])debug=/.test(location.search);
 
 let jobSeq = 0, jobCur = 0;
 function beginJob(){ jobCur = ++jobSeq; return jobCur; }
@@ -5496,73 +5496,6 @@ document.getElementById('btnStop').addEventListener('click', function(){
 });
 
 
-/* ============ 示例 ============ */
-/* 示例歌词用苏轼《水调歌头》（北宋，公有领域），避免内置任何版权歌词。
-   正式发布到公开仓库时，示例素材一律用公有领域文本，见 NOTICE.md。 */
-const DEMO_LRC = `[ti:明月几时有]
-[ar:苏轼]
-[00:00.60]明月几时有
-[00:04.90]把酒问青天
-[00:09.10]不知天上宫阙
-[00:13.40]今夕是何年
-[00:17.60]我欲乘风归去
-[00:21.90]又恐琼楼玉宇
-[00:26.10]高处不胜寒
-[00:30.30]起舞弄清影`;
-
-function demoImage(){
-  const S = 1200;
-  const c = makeCanvas(S,S), x = c.getContext('2d');
-
-  const g = x.createLinearGradient(0,0,S*0.35,S);
-  g.addColorStop(0,'#7fb9bd');
-  g.addColorStop(.28,'#3f7f8d');
-  g.addColorStop(.62,'#1b4a5c');
-  g.addColorStop(1,'#0d2b39');
-  x.fillStyle = g; x.fillRect(0,0,S,S);
-
-  // 光斑
-  const rg = x.createRadialGradient(S*0.34,S*0.26,0,S*0.34,S*0.26,S*0.62);
-  rg.addColorStop(0,'rgba(236,252,246,.95)');
-  rg.addColorStop(.35,'rgba(206,238,232,.42)');
-  rg.addColorStop(1,'rgba(206,238,232,0)');
-  x.fillStyle = rg; x.fillRect(0,0,S,S);
-
-  // 地平线
-  const hy = S*0.63;
-  const hz = x.createLinearGradient(0,hy-90,0,hy+180);
-  hz.addColorStop(0,'rgba(6,22,32,0)');
-  hz.addColorStop(.45,'rgba(5,18,27,.92)');
-  hz.addColorStop(1,'rgba(7,24,33,.95)');
-  x.fillStyle = hz; x.fillRect(0,hy-90,S,S);
-
-  // 水平亮线
-  x.strokeStyle = 'rgba(214,246,240,.55)';
-  x.lineWidth = 3;
-  x.beginPath(); x.moveTo(0,hy); x.lineTo(S,hy); x.stroke();
-
-  // 细颗粒
-  for(let i=0;i<2600;i++){
-    const a = Math.random()*0.05;
-    x.fillStyle = 'rgba(255,255,255,'+a.toFixed(3)+')';
-    x.fillRect(Math.random()*S, Math.random()*S, 2, 2);
-  }
-  return c;
-}
-
-function loadDemo(){
-  state.img = demoImage();
-  state.imgName = 'demo';
-  document.getElementById('dropImg').classList.add('has');
-  document.getElementById('imgName').textContent = '内置示例封面';
-  buildAll();
-
-  setLyrics(DEMO_LRC);
-
-  seek(0);
-  setStatus(state.lyrics.length+' 行 / '+fmt(state.duration), 'ok');
-}
-
 /* ============ 移动端外壳 ============ */
 /* 只做四件事：页签切换、按设备收紧导出选项、没有音频编码器时改走兼容录制、录制期间不息屏。
    渲染与编码逻辑一行都不动，PC 端这些分支一个都不进（条件全被 isPhone / 能力探测挡住）。 */
@@ -5902,22 +5835,6 @@ if(document.fonts && document.fonts.ready){
   });
 }
 
-const params = new URLSearchParams(location.search);
-if(params.get('demo')){
-  const init = ()=>{
-    loadDemo();
-    const o = params.get('orient');
-    if(o === 'portrait'){
-      document.querySelector('input[name=orient][value=portrait]').checked = true;
-      applyLayout('portrait');
-    }
-    const t = parseFloat(params.get('t'));
-    if(!isNaN(t)) seek(t);
-  };
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(init);
-  else setTimeout(init, 200);
-}
-
 /* 首屏之后再补全字体清单：用户可能这就要点字体下拉，超时 1.2s 必补一次 */
 (function fillFontListLater(){
   const run = function(){
@@ -5929,10 +5846,10 @@ if(params.get('demo')){
   else setTimeout(run, 350);
 })();
 
-/* 自动化/排错入口：只在 ?demo=1 或 ?debug=1 下挂到 window，
+/* 自动化/排错入口：只在 ?debug=1 下挂到 window，
    正常双击打开时不留任何全局调试面。 */
 if(IS_DEBUG) window.__app = {
-  state, seek, renderAt, loadDemo, buildAll, applyLayout, buildMovie, exportPreflight, MP4, MUX,
+  state, seek, renderAt, setLyrics, buildAll, buildLayout, applyLayout, buildMovie, exportPreflight, MP4, MUX,
   logDump, jobOK, beginJob,
   loadAudioFile, loadImageFile, parseAudioName, fontStack, overlays: ()=>overlays,
   L: ()=>L, layout: ()=>layout, pal: ()=>assets.pal, cardShift, clearTextCache,

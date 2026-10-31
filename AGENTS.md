@@ -19,7 +19,7 @@
 3. **预览 = 导出**。两者必须共用 `renderAt()`；`K === 1` 时输出要与旧版逐像素一致。
 4. **参数快照**。点导出那一刻的状态被钉死（`snapshotState`），之后改参数只影响预览。
 5. **失败不中止**。缺封面/歌词/音频/编码器失败都要换路继续；只有用户取消或内存到顶才停。
-6. **零 console**。发布版不许有 `console.log` / `debugger` / `TODO`。调试入口只在 `?demo=1` / `?debug=1` 下挂 `window.__app`。
+6. **零 console**。发布版不许有 `console.log` / `debugger` / `TODO`。调试入口只在 `?debug=1` 下挂 `window.__app`。
 
 ## 代码在哪（按功能搜函数名，别记行号）
 
@@ -56,7 +56,7 @@
 
 ```bash
 # 导出冒烟（720P / 1080P / 录制）
-node bench/run.mjs "C:/…/播放器视频生成器.html?demo=1" bench/probes/probe-final.js window
+node bench/run.mjs "C:/…/播放器视频生成器.html?debug=1" bench/probes/probe-final.js window
 
 # 布局 / CLS / 点击目标
 node bench/run.mjs "C:/…/播放器视频生成器.html" bench/probes/probe-audit.js window

@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, st = A.state, out = { runs: [], heap: [] };
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 400));
   const oc = HTMLAnchorElement.prototype.click;
   HTMLAnchorElement.prototype.click = function () {};

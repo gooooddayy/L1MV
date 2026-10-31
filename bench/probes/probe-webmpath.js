@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 400));
 
   // 让录制器只能出 WebM（模拟安卓旧内核）

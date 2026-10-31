@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, st = A.state, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 500));
   st.duration = 2; document.getElementById('inDur').value = 2;
   document.getElementById('inRes').value = '720';

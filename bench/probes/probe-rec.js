@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 400));
 
   // 3 秒 WAV，让录制带上音轨

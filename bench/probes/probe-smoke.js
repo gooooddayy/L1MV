@@ -2,7 +2,7 @@
   const A = window.__app, out = {};
   out.hasApp = !!A;
   out.logDumpType = typeof A.logDump;
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 400));
   out.logLines = A.logDump().split('\n').length;
   out.jobSeq = A.beginJob();

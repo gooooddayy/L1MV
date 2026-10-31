@@ -38,7 +38,7 @@
 node --check <(sed -n '/^<script>$/,/^<\/script>$/p' 播放器视频生成器.html | sed '1d;$d')
 
 # 导出冒烟（需要 Edge；驱动里的 EDGE 常量改成你的路径）
-node bench/run.mjs "C:/…/播放器视频生成器.html?demo=1" bench/probes/probe-final.js window
+node bench/run.mjs "C:/…/播放器视频生成器.html?debug=1" bench/probes/probe-final.js window
 ```
 
 **出片后要人耳听音画同步**，自动化验不了这个。

@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, st = A.state, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 150));
 
   // 造一个 4 秒 WAV（44.1k 单声道正弦）

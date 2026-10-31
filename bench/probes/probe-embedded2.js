@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, out = {};
-  A.loadDemo();
+  __seedDemo(A);
   await new Promise(r => setTimeout(r, 800));
   const sel = document.getElementById('inFont');
   const cv = document.getElementById('cv');

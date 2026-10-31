@@ -1,6 +1,6 @@
 (async () => {
   const A = window.__app, out = {};
-  A.loadDemo(); await new Promise(r => setTimeout(r, 300));
+  __seedDemo(A); await new Promise(r => setTimeout(r, 300));
   // 55 分钟、8kHz 单声道 16bit：文件只有 ~52MB，但解码后是 48k 立体声 ≈ 1.27GB
   const sr = 8000, secs = 5400, n = sr * secs;
   const buf = new ArrayBuffer(44 + n * 2), dv = new DataView(buf);
