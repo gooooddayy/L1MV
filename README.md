@@ -6,7 +6,7 @@
 
 **歌词播放器视频生成 · 音乐播放器效果生成**
 
-一张封面 + 一段音频 + 一份带时间轴的 LRC 歌词 → 一条带唱片、歌词滚动、光影特效的 MV
+一张封面 + 一段音频 + 一份 LRC 歌词 → 一条带唱片、歌词滚动、光影特效的 MV
 
 [![License](https://img.shields.io/badge/license-MIT-2f6fed)](LICENSE)
 [![Single File](https://img.shields.io/badge/single--file-6.6%20MB-1c8f5f)](播放器视频生成器.html)
@@ -28,7 +28,7 @@
 
 | 输入 | 输出 |
 |---|---|
-| 封面图（JPG/PNG/WebP/GIF/BMP/AVIF/SVG）<br>音频（MP3/M4A/AAC/WAV/FLAC/OGG/Opus/WebM，可选）<br>歌词（带时间轴的LRC / TXT，可选） | **MP4**（H.264 + AAC，默认）或 **MOV**<br>720P / 1080P / 2K<br>横版 1920×1080 / 竖版 1080×1920<br>剪映、Premiere、微信、相册都能直接导入 |
+| 封面图（JPG/PNG/WebP/GIF/BMP/AVIF/SVG）<br>音频（MP3/M4A/AAC/WAV/FLAC/OGG/Opus/WebM，可选）<br>歌词（带时间轴的 LRC，可选） | **MP4**（H.264 + AAC，默认）或 **MOV**<br>720P / 1080P / 2K<br>横版 1920×1080 / 竖版 1080×1920<br>剪映、Premiere、微信、相册都能直接导入 |
 
 > 单文件 6.62 MB，其中 **96% 是内置的 5 款中文字体**（离线、子集化、OFL 授权）；JS 214 KB + CSS 22 KB，剩下的才是界面。
 
@@ -183,7 +183,7 @@
 <details>
 <summary><b>支持哪些歌词格式和时间戳？</b></summary>
 
-LRC 与纯文本 TXT。时间戳支持 `[mm:ss]`、`[mm:ss.xx]`、`[mm:ss.xxx]`、`[mm:ss:xx]` 四种写法，同一行可以挂多个时间戳（重复句），enhanced LRC 的词级 `<mm:ss.xx>` 标记会自动剥掉。文件编码支持 UTF-8（含 BOM）、UTF-16、GB2312、GBK、Big5——拖进去就自动判。
+LRC 与纯文本 TXT。**要对上歌必须带时间轴**——没有时间戳的纯文本也能导入，但会按行数平均分配到整首歌，只能当占位，不会跟演唱对齐。时间戳支持 `[mm:ss]`、`[mm:ss.xx]`、`[mm:ss.xxx]`、`[mm:ss:xx]` 四种写法，同一行可以挂多个时间戳（重复句），enhanced LRC 的词级 `<mm:ss.xx>` 标记会自动剥掉。文件编码支持 UTF-8（含 BOM）、UTF-16、GB2312、GBK、Big5——拖进去就自动判。
 </details>
 
 <details>
