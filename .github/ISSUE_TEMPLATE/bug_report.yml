@@ -1,0 +1,68 @@
+name: Bug 报告
+description: 导出失败、音画不同步、界面异常等问题
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        谢谢反馈。这个项目 90% 的问题跟**浏览器内核能力**有关，所以下面几项请尽量填全。
+        如果能拿到 `?debug=1` 后的 `logDump()` 文本，定位会快很多。
+  - type: input
+    id: browser
+    attributes:
+      label: 浏览器与版本
+      description: 例如 Chrome 130.0.6723.92 / Edge 156 / Safari 18.2
+      placeholder: Chrome 130 / Windows 11
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: 系统与设备
+      placeholder: Windows 11 台式（核显 Intel HD 630）/ iPhone 15 / 小米 13
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 导出方式
+      options:
+        - 快速编码（默认）
+        - 兼容录制
+        - 两种都试过
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: 目标格式与分辨率
+      placeholder: MP4 / 1080P / 横版
+  - type: textarea
+    id: what
+    attributes:
+      label: 现象
+      description: 发生了什么？状态栏写了什么？
+      placeholder: |
+        导出的 MP4 在微信里打不开，时长显示 0。
+        状态栏显示「已导出 MP4 1920×1080 · 12.3 MB」。
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 拖入 4 分钟的 MP3
+        2. 导入 60 行 LRC
+        3. 选 1080P / 快速编码
+        4. 点导出
+  - type: textarea
+    id: log
+    attributes:
+      label: 日志（?debug=1 后在控制台执行 logDump()）
+      render: text
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      options:
+        - label: 我用的是官方 Release 或仓库里的 HTML，没有自行修改过
+          required: true

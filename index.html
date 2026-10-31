@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L1MV · 歌词播放器视频生成器｜音乐播放器效果生成 · 离线单文件导出 MP4</title>
+<meta name="description" content="L1MV 是一个单文件、离线可用的歌词播放器视频生成器：封面 + 音频 + LRC 歌词，一键导出 720P/1080P/2K 横竖版 MP4。纯前端渲染，素材不上传，免安装、无水印、免费开源。">
+<meta name="keywords" content="歌词播放器视频生成,音乐播放器效果生成,歌词视频制作,LRC转视频,歌词滚动视频,黑胶唱片视频,专辑封面视频,音乐可视化,lyric video generator,music visualizer">
+<meta name="author" content="gooooddayy">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://gooooddayy.github.io/L1MV/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="L1MV">
+<meta property="og:title" content="L1MV · 歌词播放器视频生成器">
+<meta property="og:description" content="封面 + 音频 + LRC → 720P/1080P/2K 的 MP4。单文件、离线、素材不出本机、无水印。">
+<meta property="og:image" content="https://gooooddayy.github.io/L1MV/assets/social-preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://gooooddayy.github.io/L1MV/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="L1MV · 歌词播放器视频生成器">
+<meta name="twitter:description" content="单文件、离线、零依赖的歌词播放器视频生成器：LRC + 音频 + 封面 → MP4。">
+<meta name="twitter:image" content="https://gooooddayy.github.io/L1MV/assets/social-preview.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f6fed' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.6 12C3.6 8 6 6 8.4 6.6c1.4.4 2.5 1.4 3.6 2.6 1.1-1.2 2.2-2.2 3.6-2.6C18 6 20.4 8 20.4 12'/%3E%3Cpath d='M6.2 12.6 12 19l5.8-6.4'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "L1MV 歌词播放器视频生成器",
+  "alternateName": ["L1MV", "播放器视频生成器", "歌词播放器视频生成", "音乐播放器效果生成"],
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Windows, macOS, Linux, Android, iOS",
+  "url": "https://gooooddayy.github.io/L1MV/",
+  "downloadUrl": "https://github.com/gooooddayy/L1MV",
+  "softwareVersion": "60",
+  "license": "https://opensource.org/licenses/MIT",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
+  "description": "单文件、零依赖、离线可用的歌词播放器视频生成器。封面 + 音频 + LRC 歌词，导出 720P/1080P/2K 横竖版 MP4/MOV。",
+  "featureList": ["歌词滚动 MV", "720P/1080P/2K", "横版 16:9 / 竖版 9:16", "MP4 / MOV", "离线单文件", "音频本地处理"],
+  "author": { "@type": "Person", "name": "gooooddayy", "url": "https://github.com/gooooddayy" }
+}
+</script>
+<style>
+  :root{
+    --bg:#f4f5f8; --card:#fff; --ink:#15171d; --ink2:#414958; --muted:#7b8291;
+    --line:#e6e8ef; --blue:#2f6fed; --blue-d:#1f4fc4; --blue-l:#eef3ff; --ok:#1c8f5f;
+    --r:16px; --max:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);line-height:1.7;
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;font-size:16px}
+  a{color:var(--blue);text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+  header{position:sticky;top:0;z-index:20;background:rgba(244,245,248,.97);border-bottom:1px solid var(--line)}
+  .hd{height:58px;display:flex;align-items:center;gap:10px}
+  .logo{width:22px;height:22px;color:var(--blue)}
+  .brand{font-weight:800;font-size:15px;letter-spacing:.01em}
+  .ver{font-size:11.5px;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:1px 8px}
+  .hd .sp{flex:1}
+  .ghost{font-size:13.5px;font-weight:600;color:var(--ink2);padding:7px 12px;border:1px solid var(--line);border-radius:9px;background:#fff}
+  .ghost:hover{border-color:#c8d6f2}
+  .cta{font-size:13.5px;font-weight:700;color:#fff;background:var(--blue);padding:8px 14px;border-radius:9px}
+  .cta:hover{background:var(--blue-d)}
+
+  .hero{padding:54px 0 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+  h1{font-size:44px;line-height:1.15;letter-spacing:-.02em;font-weight:800}
+  h1 em{font-style:normal;color:var(--blue)}
+  .lead{margin-top:16px;font-size:17px;color:var(--ink2);max-width:30em}
+  .lead b{color:var(--ink)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;
+    padding:12px 20px;border-radius:11px;border:1px solid transparent;transition:.18s}
+  .btn.p{background:var(--blue);color:#fff;box-shadow:0 8px 22px rgba(47,111,237,.24)}
+  .btn.p:hover{background:var(--blue-d);transform:translateY(-1px)}
+  .btn.s{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn.s:hover{border-color:#c8d6f2}
+  .meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:var(--muted)}
+  .meta i{font-style:normal;color:var(--ok);font-weight:700}
+  .shot{border-radius:18px;overflow:hidden;border:1px solid #dfe3ec;background:#0d141b;
+    box-shadow:0 24px 60px rgba(18,32,56,.18)}
+  .shot img{width:100%;height:auto}
+
+  section{padding:44px 0}
+  h2{font-size:26px;letter-spacing:-.01em;font-weight:800}
+  .sub{margin-top:8px;color:var(--muted);font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+  .cell{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+  .cell h3{font-size:15.5px;font-weight:700;margin-bottom:6px}
+  .cell p{font-size:14px;color:var(--ink2);line-height:1.65}
+  .k{display:inline-block;font-size:11.5px;font-weight:700;color:var(--blue-d);background:var(--blue-l);
+    border:1px solid #d6e2ff;border-radius:6px;padding:1px 7px;margin-bottom:9px}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px;counter-reset:s}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;position:relative}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:14px;right:16px;
+    font-size:34px;font-weight:800;color:#eef1f7;line-height:1}
+  .step b{display:block;font-size:15px;margin-bottom:6px}
+  .step span{font-size:14px;color:var(--ink2)}
+
+  table{width:100%;border-collapse:collapse;margin-top:22px;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:14px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#fafbfe;font-weight:700;font-size:13px;color:var(--ink2)}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--blue-d)}
+
+  details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:10px}
+  summary{cursor:pointer;font-weight:700;font-size:15px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:'+';float:right;color:var(--muted);font-weight:400}
+  details[open] summary::after{content:'−'}
+  details p{margin-top:10px;font-size:14.5px;color:var(--ink2)}
+
+  .note{margin-top:26px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--blue);
+    border-radius:10px;padding:14px 16px;font-size:14px;color:var(--ink2)}
+  footer{border-top:1px solid var(--line);padding:26px 0 44px;color:var(--muted);font-size:13px}
+  footer .wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--ink2)}
+
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr;gap:26px;padding:34px 0 24px}
+    h1{font-size:33px}
+    .grid,.steps{grid-template-columns:1fr}
+    .shot{order:-1}
+    table{font-size:13px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 12C3.6 8 6 6 8.4 6.6c1.4.4 2.5 1.4 3.6 2.6 1.1-1.2 2.2-2.2 3.6-2.6C18 6 20.4 8 20.4 12"/><path d="M6.2 12.6 12 19l5.8-6.4"/></svg>
+    <span class="brand">L1MV</span><span class="ver">v60</span>
+    <span class="sp"></span>
+    <a class="ghost" href="https://github.com/gooooddayy/L1MV">GitHub</a>
+    <a class="cta" href="./%E6%92%AD%E6%94%BE%E5%99%A8%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90%E5%99%A8.html">立即使用</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>歌词播放器<br><em>视频生成器</em></h1>
+      <p class="lead">一张封面 + 一段音频 + 一份 LRC 歌词，生成一条带唱片、歌词滚动、光影特效的 MV。
+        导出 <b>720P / 1080P / 2K</b> 的 <b>MP4</b>，横版竖版都行。</p>
+      <div class="btns">
+        <a class="btn p" href="./%E6%92%AD%E6%94%BE%E5%99%A8%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90%E5%99%A8.html">在线试用（免费）</a>
+        <a class="btn s" href="https://github.com/gooooddayy/L1MV/releases">下载单文件</a>
+      </div>
+      <div class="meta">
+        <span><i>✓</i> 单文件 6.6 MB</span>
+        <span><i>✓</i> 零依赖 · 离线可用</span>
+        <span><i>✓</i> 素材不出本机</span>
+        <span><i>✓</i> 无水印</span>
+      </div>
+    </div>
+    <div class="shot"><img src="assets/preview-16x9.jpg" alt="L1MV 导出的歌词播放器画面：封面卡、歌词滚动、歌名与歌手" width="1088" height="612"></div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <h2>它和在线工具不一样的地方</h2>
+      <p class="sub">不是「又一个在线生成器」，是一个可以拷进 U 盘带走的生成器。</p>
+      <div class="grid">
+        <div class="cell"><span class="k">离线</span><h3>全程不联网</h3><p>没有 CDN、没有接口、没有统计。断网、内网、飞机上都能用，音频不会离开你的电脑。</p></div>
+        <div class="cell"><span class="k">真 MP4</span><h3>H.264 + AAC</h3><p>自己在浏览器里写 MP4 容器，不是录屏出 WebM 再改后缀。剪映、PR、微信、相册都认。</p></div>
+        <div class="cell"><span class="k">中文</span><h3>内置 5 款字体</h3><p>宋、楷、毛笔、行书、圆润，全部离线内嵌。LRC 的四种时间戳、五种编码都能吃。</p></div>
+        <div class="cell"><span class="k">快</span><h3>比实时快约 2×</h3><p>1080P 10 秒片约 5 秒出片。另有「兼容录制」兜底，老设备也能出片。</p></div>
+        <div class="cell"><span class="k">清晰</span><h3>720P / 1080P / 2K</h3><p>横版 16:9 与竖版 9:16 是两套独立排版，不是简单旋转。</p></div>
+        <div class="cell"><span class="k">免费</span><h3>MIT 开源</h3><p>无水印、无次数限制、不用注册。代码和文档全在 GitHub。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>三步出片</h2>
+      <div class="steps">
+        <div class="step"><b>拖入素材</b><span>封面图、音频、LRC/TXT 歌词。少一样也能导，工具会用渐变底或纯音乐版兜住。</span></div>
+        <div class="step"><b>调样式</b><span>横竖版、字体、字号、歌词颜色、RPM、倒影/光影/颗粒等特效，实时预览。</span></div>
+        <div class="step"><b>导出</b><span>选 MP4、1080P、快速编码，点一下。导出期间界面不冻结，改参数不影响这条。</span></div>
+      </div>
+      <div class="note">
+        <b>关于兼容性：</b>如果设备没有 AAC 音频编码器（部分国产内核），会自动改出 MOV（H.264 + 未压缩 PCM），
+        保证有声音、剪映能导入，并在状态栏写明原因。
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>能导出什么</h2>
+      <table>
+        <tr><th>项目</th><th>支持</th></tr>
+        <tr><td>容器</td><td><b>MP4</b>（H.264 + AAC，默认）· <b>MOV</b>（无 AAC 编码器时，H.264 + PCM）</td></tr>
+        <tr><td>分辨率</td><td>720P · 1080P（默认）· 2K 2560×1440</td></tr>
+        <tr><td>画幅</td><td>横版 1920×1080 · 竖版 1080×1920</td></tr>
+        <tr><td>导出方式</td><td><b>快速编码</b>（WebCodecs，约 2× 速）· <b>兼容录制</b>（MediaRecorder，兼容性最好）</td></tr>
+        <tr><td>歌词</td><td>LRC / TXT；<code>[mm:ss]</code>、<code>[mm:ss.xx]</code>、<code>[mm:ss.xxx]</code>、<code>[mm:ss:xx]</code></td></tr>
+        <tr><td>音频</td><td>MP3 · M4A · AAC · WAV · FLAC · OGG · Opus · WebM</td></tr>
+        <tr><td>封面</td><td>JPG · PNG · WebP · GIF · BMP · AVIF · SVG</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>常见问题</h2>
+      <details open><summary>真的完全离线吗？会上传我的音频吗？</summary>
+        <p>是。文件里没有任何 http(s) 外链、没有 fetch/XHR/WebSocket、没有统计脚本、没有 localStorage。你可以断网后再导出验证。</p></details>
+      <details><summary>需要安装 ffmpeg 或 Python 吗？</summary>
+        <p>不需要。MP4 封装、WebM 解析、音频重采样全部是文件内的 JavaScript，一个依赖都没有。</p></details>
+      <details><summary>为什么我导出的是 MOV 而不是 MP4？</summary>
+        <p>说明这台设备的浏览器没有 AAC 音频编码器（部分国产内核会裁掉）。MP4 只认 AAC，所以自动改走 MOV（H.264 + 未压缩 PCM），有声音、剪映能导入。</p></details>
+      <details><summary>能导出 4K 吗？</summary>
+        <p>不做 4K。浏览器 H.264 编码器在 4K 上帧率会掉到个位数，2K 是实测能稳的上限。</p></details>
+      <details><summary>手机上能用吗？</summary>
+        <p>能。同一份文件，底栏两个页签左右滑动切换，默认 1080P，内存不够会自动降 720P 并说明原因。录制期间别切走、别锁屏。</p></details>
+      <details><summary>可以商用吗？字体有版权风险吗？</summary>
+        <p>代码 MIT。内置 5 款字体均为 SIL OFL 1.1（可商用、可嵌入），详见仓库的 NOTICE.md。你导入的音频/封面/歌词的版权由你自己负责。</p></details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>L1MV · 歌词播放器视频生成器</span>
+    <span>·</span>
+    <a href="https://github.com/gooooddayy/L1MV">GitHub</a>
+    <span>·</span>
+    <a href="https://github.com/gooooddayy/L1MV/blob/main/LICENSE">MIT</a>
+    <span>·</span>
+    <a href="https://github.com/gooooddayy/L1MV/blob/main/NOTICE.md">第三方声明</a>
+    <span>·</span>
+    <span>示例歌词为苏轼《水调歌头》（公有领域）</span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    width:1200px;height:630px;overflow:hidden;position:relative;
+    background:#f4f5f8;color:#15171d;
+    font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .glow{position:absolute;width:760px;height:760px;right:-220px;top:-260px;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%,rgba(47,111,237,.20),rgba(47,111,237,0) 62%)}
+  .glow2{position:absolute;width:520px;height:520px;left:-200px;bottom:-260px;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%,rgba(28,143,95,.14),rgba(28,143,95,0) 65%)}
+  .wrap{position:relative;height:100%;display:flex;align-items:center;gap:44px;padding:0 56px}
+  .left{width:520px;flex:none}
+  .brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;letter-spacing:.01em;color:#2f6fed}
+  .brand b{color:#15171d;font-weight:800}
+  .pill{font-size:12.5px;font-weight:600;color:#7b8291;border:1px solid #e0e3ec;background:#fff;
+    border-radius:999px;padding:3px 10px}
+  h1{font-size:52px;line-height:1.18;letter-spacing:-.02em;margin-top:22px;font-weight:800}
+  h1 em{font-style:normal;color:#2f6fed}
+  .sub{margin-top:16px;font-size:20px;line-height:1.55;color:#414958}
+  .tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+  .tag{font-size:14px;font-weight:600;color:#233;background:#fff;border:1px solid #e2e5ee;
+    border-radius:9px;padding:6px 11px}
+  .tag.on{background:#eef3ff;border-color:#c9d8ff;color:#1f4fc4}
+  .foot{position:absolute;left:56px;bottom:34px;font-size:14.5px;color:#7b8291;letter-spacing:.01em}
+  .card{position:relative;flex:1;border-radius:16px;overflow:hidden;background:#0d141b;
+    box-shadow:0 26px 60px rgba(18,32,56,.22),0 2px 0 rgba(255,255,255,.5) inset;border:1px solid #dfe3ec}
+  .card img{display:block;width:100%;height:auto}
+</style>
+</head>
+<body>
+  <div class="glow"></div><div class="glow2"></div>
+  <div class="wrap">
+    <div class="left">
+      <div class="brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2f6fed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 12C3.6 8 6 6 8.4 6.6c1.4.4 2.5 1.4 3.6 2.6 1.1-1.2 2.2-2.2 3.6-2.6C18 6 20.4 8 20.4 12"/><path d="M6.2 12.6 12 19l5.8-6.4"/></svg>
+        <b>L1MV</b><span class="pill">v60</span>
+      </div>
+      <h1>歌词播放器<br><em>视频生成器</em></h1>
+      <p class="sub">一张封面 + 一段音频 + 一份 LRC<br>导出 720P / 1080P / 2K 的 <b>MP4</b></p>
+      <div class="tags">
+        <span class="tag on">单文件 · 零依赖</span>
+        <span class="tag">离线可用</span>
+        <span class="tag">音频不出本机</span>
+        <span class="tag">WebCodecs</span>
+      </div>
+    </div>
+    <div class="card"><img src="preview-16x9.jpg" alt="L1MV 导出的歌词播放器画面"></div>
+  </div>
+  <div class="foot">github.com/gooooddayy/L1MV</div>
+</body>
+</html>

@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>音乐播放器 CD 弹出效果 · 完整制作方案</title>
+<style>
+  :root{
+    --bg:#f5f6f9; --card:#ffffff; --ink:#14161c; --ink2:#3d4453; --muted:#79808f;
+    --line:#e7e9f0; --line2:#eff1f6;
+    --blue:#2f6fed; --blue-d:#1f4fc4; --blue-l:#eef3ff;
+    --cyan:#0ea5b7; --amber:#d9880f; --amber-l:#fdf3e0;
+    --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:#cfe0ff}
+
+  .topbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;background:transparent}
+  .topbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .1s linear}
+
+  nav{
+    position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(245,246,249,.82);border-bottom:1px solid var(--line);
+  }
+  .nav-in{max-width:1060px;margin:0 auto;padding:0 28px;height:54px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+  .nav-in::-webkit-scrollbar{display:none}
+  .nav-in b{font-size:13px;letter-spacing:.02em;color:var(--ink);margin-right:10px;white-space:nowrap}
+  .nav-in b em{color:var(--blue);font-style:normal}
+  nav a{
+    font-size:13px;color:var(--muted);text-decoration:none;padding:5px 11px;border-radius:999px;
+    white-space:nowrap;transition:.22s;
+  }
+  nav a:hover{color:var(--ink);background:#fff}
+  nav a.on{color:var(--blue);background:#e8efff}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:0 28px}
+
+  header.hero{padding:64px 0 34px}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;color:var(--blue);font-weight:600;margin-bottom:18px}
+  .kicker i{width:22px;height:1px;background:var(--blue);display:block;opacity:.5}
+  h1{font-size:40px;line-height:1.28;letter-spacing:-.02em;font-weight:700;margin-bottom:16px}
+  h1 small{display:block;font-size:16px;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:12px;line-height:1.8}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+  .chip{font-size:12.5px;padding:5px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink2)}
+  .chip b{color:var(--ink);font-weight:600}
+
+  .lead{margin-top:28px;padding:22px 24px;background:#fff;border:1px solid var(--line);border-radius:var(--r);border-left:3px solid var(--blue)}
+  .lead p{font-size:15px;color:var(--ink2)}
+  .lead b{color:var(--ink)}
+
+  section{padding:52px 0 8px;scroll-margin-top:70px}
+  .sec-h{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+  .sec-h .num{font-size:13px;font-weight:700;color:#c8cddb;letter-spacing:.1em;font-variant-numeric:tabular-nums}
+  .sec-h h2{font-size:24px;letter-spacing:-.01em;font-weight:700}
+  .sec-sub{color:var(--muted);font-size:13.5px;margin:2px 0 26px 41px}
+
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;font-size:13.5px}
+  thead th{
+    text-align:left;font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:600;
+    padding:11px 14px;background:#fafbfd;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  td{padding:12px 14px;border-bottom:1px solid var(--line2);color:var(--ink2);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#fbfcfe}
+  td b{color:var(--ink);font-weight:600}
+  td code,p code,li code{
+    font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:12.5px;
+    background:#f0f3f9;color:#2b3a55;padding:1px 6px;border-radius:5px;
+  }
+  .num-cell{font-variant-numeric:tabular-nums;font-family:ui-monospace Consolas,monospace;color:var(--ink);white-space:nowrap}
+
+  .tbl-note{font-size:12.5px;color:var(--muted);margin-top:10px;padding-left:2px}
+
+  /* layered list */
+  .stack{display:flex;flex-direction:column-reverse;gap:6px;margin-top:4px}
+  .layer{
+    display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:14px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px;
+    transition:transform .25s ease,box-shadow .25s ease,border-color .25s;
+  }
+  .layer:hover{transform:translateX(6px);border-color:#c9d7f5;box-shadow:0 8px 22px -12px rgba(47,111,237,.35)}
+  .layer .idx{font-size:12px;font-weight:700;color:#b9c1d4;font-variant-numeric:tabular-nums}
+  .layer .nm{font-size:14px;font-weight:600;color:var(--ink)}
+  .layer .ds{font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px}
+  .layer .tag{font-size:11.5px;padding:3px 9px;border-radius:999px;background:#f0f4fd;color:#3a5f9e;white-space:nowrap}
+  .layer.k .tag{background:var(--amber-l);color:var(--amber)}
+  .layer.k{border-left:3px solid var(--amber)}
+
+  /* timeline */
+  .tl{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px 22px 16px;position:relative;overflow:visible}
+  .tl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .tl-head span{font-size:12px;color:var(--muted)}
+  .tl-axis{position:relative;height:18px;margin-left:104px;margin-bottom:6px}
+  .tl-axis b{position:absolute;transform:translateX(-50%);font-size:11px;color:#a9b2c4;font-weight:400;font-variant-numeric:tabular-nums}
+  .tl-row{display:grid;grid-template-columns:104px 1fr;align-items:center;gap:0;height:38px}
+  .tl-row .rn{font-size:12.5px;color:var(--ink2);padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tl-track{position:relative;height:24px;background:#f7f9fc;border-radius:6px}
+  .tl-track i{
+    position:absolute;top:5px;height:14px;border-radius:4px;background:linear-gradient(90deg,#7ba4f5,#4a83ee);
+    cursor:default;transition:filter .2s;
+  }
+  .tl-track i.warm{background:linear-gradient(90deg,#f2c078,#e8a13c)}
+  .tl-track i.soft{background:linear-gradient(90deg,#a8d8e0,#6fc3d1)}
+  .tl-track i:hover{filter:brightness(1.06)}
+  .tl-track i:after{
+    content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%) translateY(4px);
+    background:#1b2233;color:#fff;font-size:11.5px;line-height:1.5;padding:6px 10px;border-radius:7px;
+    white-space:nowrap;opacity:0;pointer-events:none;transition:.2s;z-index:9;
+  }
+  .tl-track i:hover:after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .step{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px 22px 18px;position:relative;transition:.25s}
+  .step:hover{box-shadow:0 14px 40px -26px rgba(20,40,90,.4);border-color:#d8e0f2}
+  .step .sn{
+    position:absolute;right:18px;top:14px;font-size:38px;font-weight:700;color:#f0f2f8;
+    letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;
+  }
+  .step h3{font-size:15.5px;font-weight:700;margin-bottom:4px;position:relative;z-index:1}
+  .step .meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+  .path{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:12px;font-size:11.5px}
+  .path span{background:#f1f5fd;color:#3c5c92;padding:2.5px 8px;border-radius:6px}
+  .path em{color:#c3cad9;font-style:normal;font-size:10px}
+  .step ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .step li{font-size:13.2px;color:var(--ink2);padding-left:13px;position:relative;line-height:1.65}
+  .step li:before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:#c3d3f0}
+  .step .warn{
+    margin-top:12px;font-size:12.2px;color:#8a5a05;background:var(--amber-l);
+    border-radius:8px;padding:8px 11px;line-height:1.6;
+  }
+  .step .warn b{color:#7a4d00}
+
+  /* calc */
+  .calc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .field input{
+    width:100%;font-size:15px;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+    background:#fafbfd;color:var(--ink);font-family:inherit;transition:.2s;
+  }
+  .field input:focus{outline:none;border-color:#a9c4f7;background:#fff;box-shadow:0 0 0 3px #eaf1ff}
+  .out{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start}
+  .kv{background:#f8fafd;border-radius:10px;padding:11px 13px}
+  .kv span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:2px}
+  .kv b{font-size:17px;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .kv b i{font-size:11.5px;font-style:normal;color:var(--muted);font-weight:400;margin-left:2px}
+
+  /* demo */
+  .demo-shell{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px}
+  .demo-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 4px 14px}
+  .demo-bar .tx{font-size:12.5px;color:var(--muted)}
+  .btn{
+    appearance:none;border:1px solid #cfdcf6;background:#f2f7ff;color:var(--blue-d);
+    font-family:inherit;font-size:13px;font-weight:600;padding:7px 16px;border-radius:9px;cursor:pointer;
+    transition:.2s;display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn:hover{background:#e5efff;border-color:#b6cdf5;transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+
+  .stage{
+    position:relative;width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;
+    background:#07131d;isolation:isolate;--u:8px;
+  }
+  .stage .bg{
+    position:absolute;inset:-8%;z-index:0;
+    background:
+      radial-gradient(52% 55% at 22% 28%, #2f8bb0 0%, rgba(47,139,176,0) 68%),
+      radial-gradient(46% 48% at 72% 20%, #3a6fbe 0%, rgba(58,111,190,0) 70%),
+      radial-gradient(58% 62% at 66% 88%, #0f4560 0%, rgba(15,69,96,0) 72%),
+      radial-gradient(40% 44% at 12% 84%, #1d6a7d 0%, rgba(29,106,125,0) 70%),
+      linear-gradient(158deg,#0a2534 0%,#123c52 46%,#0a1d2b 100%);
+    filter:blur(6px) saturate(1.12) brightness(.9);
+  }
+  .stage .ripples{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .stage .ripples i{
+    position:absolute;border-radius:50%;border:1px solid rgba(190,235,255,.55);
+    width:var(--s);height:var(--s);left:var(--x);top:var(--y);opacity:0;
+    animation:rip 7s linear infinite;animation-delay:var(--d);
+  }
+  @keyframes rip{
+    0%{transform:scale(.25);opacity:0}
+    12%{opacity:.55}
+    70%{opacity:.14}
+    100%{transform:scale(1.35);opacity:0}
+  }
+  .stage .zoom{position:absolute;inset:0;z-index:2}
+  .stage.play .zoom{animation:zoomIn .85s cubic-bezier(.2,.85,.2,1) both}
+  @keyframes zoomIn{from{transform:scale(.87);filter:blur(7px);opacity:.25}to{transform:scale(1);filter:blur(0);opacity:1}}
+  .stage .sway{position:absolute;inset:0}
+  .stage.play .sway{animation:sway 7.5s ease-in-out .9s infinite both}
+  @keyframes sway{
+    0%{transform:translate(-.25%,.1%) rotate(-.22deg)}
+    50%{transform:translate(.3%,-.15%) rotate(.24deg)}
+    100%{transform:translate(-.25%,.1%) rotate(-.22deg)}
+  }
+
+  .ttl{position:absolute;left:6.4%;top:6.5%;z-index:6}
+  .ttl h4{font-size:calc(var(--u)*2.55);font-weight:700;color:#fff;letter-spacing:.01em;text-shadow:0 calc(var(--u)*.12) calc(var(--u)*.5) rgba(0,20,40,.55);line-height:1.3}
+  .ttl p{font-size:calc(var(--u)*1.18);color:rgba(255,255,255,.72);letter-spacing:.22em;margin-top:calc(var(--u)*.25)}
+
+  .obj{position:absolute;left:6.4%;top:26%;height:44%;aspect-ratio:1;z-index:5}
+  .shadow{
+    position:absolute;inset:5% -4% -4% 5%;z-index:1;border-radius:calc(var(--u)*2.4);
+    background:rgba(2,10,18,.62);filter:blur(calc(var(--u)*1.15));
+  }
+  .cd{
+    position:absolute;left:4.5%;top:4.5%;width:91%;aspect-ratio:1;z-index:2;
+    border-radius:50%;
+    box-shadow:inset 0 0 0 1px rgba(220,245,255,.32), 0 calc(var(--u)*.6) calc(var(--u)*2) rgba(0,0,0,.5), 0 0 calc(var(--u)*2.6) rgba(110,200,240,.16);
+  }
+  .stage.play .cd{animation:cdOut .82s cubic-bezier(.16,1,.3,1) .95s both}
+  @keyframes cdOut{from{transform:translateX(0)}to{transform:translateX(72%)}}
+  .cdsp{position:absolute;inset:0;border-radius:50%;overflow:hidden}
+  .stage.play .cdsp{animation:spin 9s linear 1.7s infinite both}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .cdart{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(38% 38% at 34% 30%, rgba(190,238,255,.95), rgba(190,238,255,0) 62%),
+      radial-gradient(46% 46% at 70% 68%, rgba(110,205,232,.85), rgba(110,205,232,0) 66%),
+      radial-gradient(70% 70% at 50% 52%, #1d6b93 0%, #0d3c56 72%, #07212f 100%);
+    filter:saturate(1.08) brightness(1.06);
+  }
+  .groove{
+    position:absolute;inset:0;border-radius:50%;
+    background:repeating-radial-gradient(circle at 50% 50%,
+      rgba(255,255,255,.10) 0 1px, rgba(0,0,0,0) 1px 4.5px);
+    mix-blend-mode:screen;
+  }
+  .sweep{
+    position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg, rgba(255,255,255,.20), rgba(255,255,255,0) 22%, rgba(255,255,255,0) 55%, rgba(255,255,255,.14) 78%, rgba(255,255,255,.20));
+    mix-blend-mode:screen;opacity:.55;
+  }
+  .ring{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:28%;aspect-ratio:1;border-radius:50%;
+    background:rgba(9,20,30,.5);
+    border:calc(var(--u)*.8) solid rgba(255,255,255,.94);
+    box-shadow:0 0 calc(var(--u)*1.2) rgba(0,0,0,.35) inset;
+  }
+  .hole{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:7%;aspect-ratio:1;border-radius:50%;background:#061520;
+    box-shadow:0 0 0 1px rgba(255,255,255,.18);
+  }
+  .card{
+    position:absolute;inset:0;z-index:3;border-radius:calc(var(--u)*2.4);overflow:hidden;
+    border:1px solid rgba(255,255,255,.55);
+    box-shadow:0 calc(var(--u)*1.1) calc(var(--u)*3) rgba(0,0,0,.45);
+  }
+  .art{
+    position:absolute;inset:0;
+    background:
+      radial-gradient(42% 42% at 30% 26%, rgba(214,244,255,.98), rgba(214,244,255,0) 62%),
+      radial-gradient(48% 48% at 72% 74%, rgba(126,214,236,.9), rgba(126,214,236,0) 66%),
+      radial-gradient(72% 72% at 50% 50%, #358cba 0%, #175b7d 68%, #0d3a52 100%);
+  }
+  .art:after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(155deg,rgba(255,255,255,.32),rgba(255,255,255,0) 42%);
+  }
+  .reflect{
+    position:absolute;left:0;top:100%;width:100%;height:100%;z-index:0;
+    transform:scaleY(-1);opacity:.34;filter:blur(calc(var(--u)*.5)) saturate(.85);
+    border-radius:calc(var(--u)*2.4);overflow:hidden;
+  }
+  .reflect .rart{position:absolute;inset:0;background:inherit}
+  .reflect .rart{
+    background:
+      radial-gradient(42% 42% at 30% 26%, rgba(214,244,255,.95), rgba(214,244,255,0) 62%),
+      radial-gradient(48% 48% at 72% 74%, rgba(126,214,236,.85), rgba(126,214,236,0) 66%),
+      radial-gradient(72% 72% at 50% 50%, #2f7ea8 0%, #14506d 68%, #0c3448 100%);
+  }
+  .reflect:after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to bottom, rgba(6,20,30,.96) 0%, rgba(6,20,30,.35) 45%, rgba(6,20,30,0) 80%);
+  }
+
+  .ly{position:absolute;left:47.5%;top:15%;width:46.5%;height:66%;overflow:hidden;z-index:6;display:flex;align-items:center;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 16%,#000 84%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 16%,#000 84%,transparent)}
+  .ly-in{width:100%;transition:transform .62s cubic-bezier(.3,.85,.2,1)}
+  .ln{
+    font-size:calc(var(--u)*2.28);line-height:2.18;color:rgba(255,255,255,.5);
+    white-space:nowrap;text-shadow:0 1px 5px rgba(0,15,30,.55);transition:color .5s,opacity .5s;
+  }
+  .ln.on{color:#fff;text-shadow:0 0 calc(var(--u)*1.8) rgba(140,225,255,.7),0 1px 4px rgba(0,10,25,.7)}
+
+  .ui{position:absolute;left:6.4%;top:79.5%;width:29%;z-index:7}
+  .bar{position:relative;height:2px;background:rgba(255,255,255,.24);border-radius:2px;overflow:visible}
+  .barfill{position:absolute;left:0;top:0;height:100%;width:8%;background:linear-gradient(90deg,#63d5f2,#fff);border-radius:2px}
+  .stage.play .barfill{animation:prog 18s linear .3s both}
+  @keyframes prog{from{width:8%}to{width:100%}}
+  .barfill:after{
+    content:"";position:absolute;right:-2px;top:50%;transform:translateY(-50%);
+    width:calc(var(--u)*.55);height:calc(var(--u)*.55);border-radius:50%;background:#fff;
+    box-shadow:0 0 calc(var(--u)*.8) rgba(150,230,255,.9);
+  }
+  .btns{display:flex;align-items:center;gap:calc(var(--u)*1.55);margin-top:calc(var(--u)*1.5)}
+  .btns svg{width:calc(var(--u)*1.75);height:calc(var(--u)*1.75);color:rgba(255,255,255,.9)}
+  .btns svg.play{width:calc(var(--u)*2.75);height:calc(var(--u)*2.75);color:#fff}
+
+  .vignette{position:absolute;inset:0;z-index:8;pointer-events:none;background:radial-gradient(72% 72% at 46% 46%,rgba(0,0,0,0) 52%,rgba(2,12,20,.5) 100%)}
+
+  .demo-foot{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  .demo-foot div{background:#f8fafd;border-radius:10px;padding:10px 12px}
+  .demo-foot span{display:block;font-size:11.5px;color:var(--muted)}
+  .demo-foot b{font-size:12.8px;color:var(--ink);font-weight:600}
+
+  /* pitfalls */
+  .faults{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:0;overflow:hidden;transition:.2s}
+  details[open]{border-color:#d5e0f5;box-shadow:0 10px 30px -24px rgba(30,60,120,.5)}
+  summary{
+    cursor:pointer;padding:14px 16px;font-size:13.5px;font-weight:600;color:var(--ink);
+    list-style:none;display:flex;align-items:center;gap:10px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary:before{
+    content:"";width:6px;height:6px;border-radius:50%;background:#e8a13c;flex:none;
+  }
+  summary:after{
+    content:"+";margin-left:auto;color:#b9c1d4;font-weight:400;font-size:16px;transition:.2s;
+  }
+  details[open] summary:after{content:"–";color:var(--blue)}
+  details .body{padding:0 16px 15px 32px;font-size:13px;color:var(--ink2)}
+  details .body b{color:var(--ink)}
+
+  footer{margin-top:70px;padding:30px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+  .rv{opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1)}
+  .rv.in{opacity:1;transform:none}
+
+  .toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,14px);background:#1b2233;color:#fff;
+    font-size:13px;padding:9px 18px;border-radius:9px;opacity:0;pointer-events:none;transition:.28s;z-index:99;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:820px){
+    h1{font-size:29px}
+    .steps,.calc,.faults,.demo-foot{grid-template-columns:1fr}
+    .wrap,.nav-in{padding-left:18px;padding-right:18px}
+    .sec-sub{margin-left:0}
+    header.hero{padding-top:40px}
+    table{font-size:12.5px}
+    thead th,td{padding:9px 10px}
+  }
+</style>
+</head>
+<body>
+<div class="topbar"><i id="prog"></i></div>
+
+<nav>
+  <div class="nav-in">
+    <b>CD 弹出 <em>方案</em></b>
+    <a href="#s1" class="on">拆解</a>
+    <a href="#s2">图层</a>
+    <a href="#s3">时间轴</a>
+    <a href="#s4">分步</a>
+    <a href="#s5">关键帧</a>
+    <a href="#s6">参数</a>
+    <a href="#s7">节奏</a>
+    <a href="#s8">复现</a>
+    <a href="#s9">排错</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker"><i></i>剪映 · 音乐播放器模板拆解</div>
+  <h1>《寂寞沙洲冷》播放器效果<br>完整制作方案
+    <small>一张图用三次 · 两个关键帧撑起全部动效 · 四层氛围特效收尾</small>
+  </h1>
+  <div class="chips">
+    <div class="chip">画布 <b>1920×1080 / 16:9</b></div>
+    <div class="chip">帧率 <b>30fps</b></div>
+    <div class="chip">图层 <b>8 层</b></div>
+    <div class="chip">核心动效 <b>2 个关键帧</b></div>
+    <div class="chip">成片时长 <b>15s 起</b></div>
+  </div>
+
+  <div class="lead">
+    <p><b>一句话看懂：</b>把同一张图分别做成「压暗的背景」「清晰的封面卡」「圆形的 CD」，让 CD 藏在卡片<b>下面</b>，用一段位移关键帧把它<b>向右抽出</b>，再补一段旋转关键帧让它匀速转——剩下的倒影、摇晃、雨滴、泡泡变焦，全部是给这个结构加"氛围"的配料。</p>
+  </div>
+</header>
+
+<section id="s1" class="rv">
+  <div class="sec-h"><span class="num">01</span><h2>画面拆解：8 个元素，3 个功能区</h2></div>
+  <p class="sec-sub">横向三分构图——左侧承担视觉主体，右侧承担信息，左下承担"这是播放器"的识别符号。</p>
+
+  <table>
+    <thead><tr><th style="width:34px">#</th><th style="width:150px">元素</th><th style="width:160px">位置 / 占比</th><th>作用</th><th style="width:210px">制作手段</th></tr></thead>
+    <tbody>
+      <tr><td class="num-cell">1</td><td><b>背景层</b></td><td>全屏铺满</td><td>压暗托底，让前景跳出来</td><td>主轨道 · 不透明度 <code>60</code></td></tr>
+      <tr><td class="num-cell">2</td><td><b>投影层</b></td><td>卡片正下方</td><td>制造"卡片浮在画面上"的立体感</td><td>黑底素材 + 矩形蒙版 + 羽化</td></tr>
+      <tr><td class="num-cell">3</td><td><b>封面卡</b></td><td>左 6%–31%，高 44%</td><td>视觉主体①，观众第一眼落点</td><td>画中画 · 1:1 + 矩形蒙版圆角 20</td></tr>
+      <tr><td class="num-cell">4</td><td><b>圆形 CD</b></td><td>与卡片右侧重叠 35%</td><td>视觉主体②，动效核心</td><td>复制画中画 · 圆形蒙版 + 位移关键帧</td></tr>
+      <tr><td class="num-cell">5</td><td><b>中心圆环贴纸</b></td><td>与 CD 同心</td><td>补出黑胶"中心孔"，让圆盘像唱片</td><td>贴纸层 · 与 CD 同步位移</td></tr>
+      <tr><td class="num-cell">6</td><td><b>竖排歌词</b></td><td>右 46%–96%</td><td>信息层，逐行上滚</td><td>歌词轨道 + 色度抠图 / 文本动画</td></tr>
+      <tr><td class="num-cell">7</td><td><b>播放器 UI</b></td><td>左 6%–35%，底部</td><td>"这是播放器"的识别符号</td><td>特效「播放器三」· 纹理 0</td></tr>
+      <tr><td class="num-cell">8</td><td><b>氛围特效</b></td><td>全屏</td><td>统一质感，隐藏合成痕迹</td><td>水中倒影 / 左右摇晃 / 雨滴晕开 / 泡泡变焦</td></tr>
+    </tbody>
+  </table>
+  <p class="tbl-note">注：截图为 3:2 裁切，实际工程按 16:9 搭建更稳；各百分比均为相对画面宽高的比例，可直接套用。</p>
+</section>
+
+<section id="s2" class="rv">
+  <div class="sec-h"><span class="num">02</span><h2>图层顺序：这是整个效果成立的前提</h2></div>
+  <p class="sec-sub">从下往上读。顺序错一层，"CD 从封面里抽出来"立刻穿帮成"CD 贴在封面上"。</p>
+
+  <div class="stack" id="stack">
+    <div class="layer k">
+      <div class="idx">08</div>
+      <div><div class="nm">氛围特效（全局）</div><div class="ds">水中倒影 · 左右摇晃 · 雨滴晕开 · 泡泡变焦</div></div>
+      <div class="tag">作用对象：全局</div>
+    </div>
+    <div class="layer">
+      <div class="idx">07</div>
+      <div><div class="nm">播放器三 UI</div><div class="ds">进度条 + 收藏 / 上一首 / 播放 / 下一首 / 列表</div></div>
+      <div class="tag">纹理 = 0</div>
+    </div>
+    <div class="layer">
+      <div class="idx">06</div>
+      <div><div class="nm">歌词</div><div class="ds">右侧竖排，当前行高亮，其余 50% 透明度</div></div>
+      <div class="tag">逐行滚动</div>
+    </div>
+    <div class="layer">
+      <div class="idx">05</div>
+      <div><div class="nm">封面卡</div><div class="ds">1:1 圆角矩形，压在 CD 之上——它就是"抽出来"的遮挡物</div></div>
+      <div class="tag">圆角 20</div>
+    </div>
+    <div class="layer k">
+      <div class="idx">04</div>
+      <div><div class="nm">中心圆环贴纸</div><div class="ds">在 CD 之上、封面卡之下，跟着 CD 一起位移</div></div>
+      <div class="tag">协同关键帧</div>
+    </div>
+    <div class="layer k">
+      <div class="idx">03</div>
+      <div><div class="nm">圆形 CD</div><div class="ds">圆形蒙版画中画，位移 + 旋转的承载者</div></div>
+      <div class="tag">位移 + 旋转</div>
+    </div>
+    <div class="layer">
+      <div class="idx">02</div>
+      <div><div class="nm">投影（黑影）</div><div class="ds">黑底素材 + 矩形蒙版，羽化 5–8</div></div>
+      <div class="tag">置底</div>
+    </div>
+    <div class="layer">
+      <div class="idx">01</div>
+      <div><div class="nm">背景（主轨道）</div><div class="ds">同素材放大铺满，不透明度 60%，压暗整幅画面</div></div>
+      <div class="tag">opacity 60</div>
+    </div>
+  </div>
+  <p class="tbl-note">橙色标记的四层是这个效果的"机关"，其余都是配角。剪映的「层级 → 全部轨道」面板里，把 CD 拖到封面卡下面、贴纸拖到 CD 上面，一次就能摆对。</p>
+</section>
+
+<section id="s3" class="rv">
+  <div class="sec-h"><span class="num">03</span><h2>动效时间轴：0–16 秒怎么分配</h2></div>
+  <p class="sec-sub">悬停色块看具体作用。节奏原则：0.5 秒内完成入场，1 秒内完成弹出，剩下的时间全部交给"持续运动"。</p>
+
+  <div class="tl">
+    <div class="tl-head">
+      <span>时间（秒）</span>
+      <span>总长 16s · 30fps</span>
+    </div>
+    <div class="tl-axis">
+      <b style="left:0%">0</b><b style="left:25%">4</b><b style="left:50%">8</b><b style="left:75%">12</b><b style="left:100%">16</b>
+    </div>
+    <div class="tl-row"><div class="rn">泡泡变焦</div><div class="tl-track"><i class="warm" style="left:0%;width:3%" data-tip="0–0.5s 入场推进，缩短到 15 帧"></i></div></div>
+    <div class="tl-row"><div class="rn">封面卡</div><div class="tl-track"><i style="left:1.2%;width:98.8%" data-tip="0.2s 起常驻，全程不动"></i></div></div>
+    <div class="tl-row"><div class="rn">CD 弹出</div><div class="tl-track"><i class="warm" style="left:5.6%;width:5.1%" data-tip="0.9–1.7s 位移 0 → 64%"></i></div></div>
+    <div class="tl-row"><div class="rn">CD 旋转</div><div class="tl-track"><i style="left:10.6%;width:89.4%" data-tip="1.7s 起匀速转到片尾"></i></div></div>
+    <div class="tl-row"><div class="rn">歌词滚动</div><div class="tl-track"><i class="soft" style="left:7.5%;width:92.5%" data-tip="1.2s 起按 LRC 逐行"></i></div></div>
+    <div class="tl-row"><div class="rn">氛围特效</div><div class="tl-track"><i class="soft" style="left:2.5%;width:97.5%" data-tip="0.4s 起全程循环：摇晃 / 雨滴 / 倒影"></i></div></div>
+    <div class="tl-row"><div class="rn">弹出音效</div><div class="tl-track"><i class="warm" style="left:10.3%;width:0.9%" data-tip="1.65s 峰值对齐弹出终点帧"></i></div></div>
+  </div>
+</section>
+
+<section id="s4" class="rv">
+  <div class="sec-h"><span class="num">04</span><h2>分步制作：9 步落到参数</h2></div>
+  <p class="sec-sub">每步都给了具体数值。原教程说"调整合适的大小"的地方，这里换成了可直接输入的占比。</p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="sn">01</div>
+      <h3>建工程 + 背景压暗</h3>
+      <div class="meta">约 2 分钟 · 决定整体影调</div>
+      <div class="path"><span>新建项目</span><em>›</em><span>主轨道</span><em>›</em><span>不透明度</span></div>
+      <ul>
+        <li>画布 1920×1080，30fps；素材 <b>放大到 130%</b> 以上铺满，避免边缘露黑</li>
+        <li>不透明度拉到 <code>60</code>；后面若发灰，加调节：对比度 <code>+10</code>、饱和度 <code>+8</code></li>
+        <li>可选：加"模糊" <code>15–25</code>，让背景彻底退到后景</li>
+      </ul>
+      <div class="warn"><b>别做：</b>背景别用另一张图。同一素材压暗才有"同一场景"的连贯感。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">02</div>
+      <h3>做封面卡（1:1 + 圆角）</h3>
+      <div class="meta">约 3 分钟 · 视觉主体</div>
+      <div class="path"><span>复制</span><em>›</em><span>切画中画</span><em>›</em><span>编辑</span><em>›</em><span>裁剪 1:1</span><em>›</em><span>蒙版</span></div>
+      <ul>
+        <li>裁剪比例选 <b>1:1</b>，缩放高度到画面 <b>44%</b>（1080 下约 475px）</li>
+        <li>蒙版 → 矩形 → 宽高调成一致（= 正方形），<b>圆角 20</b>，羽化 <code>0–1</code></li>
+        <li>位置：水平中心约 <code>x 18.5%</code>，垂直中心 <code>y 48%</code></li>
+      </ul>
+      <div class="warn"><b>易错：</b>剪映的"圆角"是 0–100 的<b>相对值</b>，不是像素。20 ≈ 短边的 10%，475px 的卡片就是 24px 圆角。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">03</div>
+      <h3>做投影（黑影）</h3>
+      <div class="meta">约 2 分钟 · 立体感来源</div>
+      <div class="path"><span>导入黑底</span><em>›</em><span>裁剪 1:1</span><em>›</em><span>层级 置底</span><em>›</em><span>矩形蒙版</span></div>
+      <ul>
+        <li>黑底素材同样裁 1:1，蒙版尺寸与封面卡<b>完全一致</b>，圆角同样 <code>20</code></li>
+        <li>羽化 <code>5–8</code>，不透明度 <code>40–50</code>，相对卡片<b>右下偏移 6–8px</b></li>
+        <li>要"发光"而不是"投影"：换白底素材，羽化拉到 <code>20</code></li>
+      </ul>
+      <div class="warn"><b>层级：</b>黑影必须置底，否则会盖住 CD 的滑出路径。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">04</div>
+      <h3>做圆形 CD 并弹出</h3>
+      <div class="meta">约 5 分钟 · 全场核心</div>
+      <div class="path"><span>复制封面卡</span><em>›</em><span>蒙版 圆形</span><em>›</em><span>层级 全部轨道</span><em>›</em><span>关键帧</span></div>
+      <ul>
+        <li>复制封面卡这一层，蒙版换成<b>圆形</b>，直径 = 卡片边长 × <code>0.91</code></li>
+        <li>层级面板 → 全部轨道 → CD 拖到<b>封面卡之下</b>、贴纸之下（此时它被卡完全盖住）</li>
+        <li>在 <code>0.9s</code> 打位置关键帧（X = 卡片中心）；<code>1.7s</code> 打第二帧，X 右移 = CD 直径的 <code>72%</code></li>
+        <li>第二帧缓动改成<b>缓出</b>，或自定义贝塞尔 <code>0.16, 1, 0.30, 1</code></li>
+      </ul>
+      <div class="warn"><b>判断标准：</b>成片里应当露出约 <b>2/3 的圆面</b>，剩下 1/3 仍被卡片压住——这是"抽出来"和"贴上去"的区别。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">05</div>
+      <h3>贴纸同步 + 置底</h3>
+      <div class="meta">约 2 分钟 · 让圆盘像唱片</div>
+      <div class="path"><span>贴纸</span><em>›</em><span>调大小</span><em>›</em><span>对齐 CD 中心</span><em>›</em><span>同帧关键帧</span></div>
+      <ul>
+        <li>圆形贴纸尺寸 = CD 直径（略小 1–2% 更好），移动到 CD 正中心</li>
+        <li>在 CD 的<b>同两个时间点</b>打关键帧，位移量完全相同</li>
+        <li>层级：贴纸在 CD <b>之上</b>、封面卡<b>之下</b></li>
+      </ul>
+      <div class="warn"><b>关键：</b>贴纸和 CD 必须"同帧同距离"，差一帧就会出现圆环和盘面分离的诡异抖动。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">06</div>
+      <h3>统一时长 + CD 旋转</h3>
+      <div class="meta">约 4 分钟 · 让画面"活"起来</div>
+      <div class="path"><span>拉长所有轨道</span><em>›</em><span>时间轴末尾</span><em>›</em><span>基础属性 旋转</span></div>
+      <ul>
+        <li>先把所有轨道拉到与歌词同长（否则旋转只转到一半就断了）</li>
+        <li>CD 轨道末尾 → 基础属性 → 旋转输入角度，<b>自动生成末尾关键帧</b></li>
+        <li>所有旋转关键帧缓动 = <b>线性</b>，否则会出现"转一下停一下"</li>
+      </ul>
+      <div class="warn"><b>不要：</b>别给贴纸也加旋转关键帧。正圆转了看不出，但贴纸上的中心孔一旦不对称就会露馅。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">07</div>
+      <h3>歌词轨 + 抠像</h3>
+      <div class="meta">约 4 分钟 · 信息层</div>
+      <div class="path"><span>导入歌词</span><em>›</em><span>编辑 裁剪</span><em>›</em><span>抠像 色度抠图</span></div>
+      <ul>
+        <li>导入 LRC 或"识别歌词"，裁剪掉多余边距，缩放到右侧 <b>46%–96%</b> 区域</li>
+        <li>如果是绿幕歌词素材：抠像 → 色度抠图，吸绿色，强度 <code>45–60</code>、阴影 <code>10</code></li>
+        <li>如果是 LRC 生成的文本：<b>不需要抠像</b>，直接设字号 <code>40</code>、行距 <code>1.9</code>、白色 + 当前行发光</li>
+      </ul>
+      <div class="warn"><b>注意：</b>LRC 导入的是文本层，对它做色度抠图会整层消失——这一步要看你导入的到底是文本还是绿幕视频。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">08</div>
+      <h3>播放器三特效</h3>
+      <div class="meta">约 2 分钟 · 播放器识别度</div>
+      <div class="path"><span>特效</span><em>›</em><span>画面特效</span><em>›</em><span>播放器三</span><em>›</em><span>参数</span></div>
+      <ul>
+        <li><b>纹理 = 0</b>：去掉颗粒/噪点，UI 变干净</li>
+        <li>旋转 <code>0°</code>（横屏）；若特效默认竖排，用 <code>-90°</code></li>
+        <li>作用对象 = 全局；把进度条组件贴到卡片下方约 <b>4% 画面高</b>处</li>
+      </ul>
+      <div class="warn"><b>层级：</b>UI 要在歌词之上、氛围特效之下，否则倒影会把进度条也倒一遍。</div>
+    </div>
+
+    <div class="step">
+      <div class="sn">09</div>
+      <h3>氛围四件套 + 音效</h3>
+      <div class="meta">约 5 分钟 · 决定"质感"</div>
+      <div class="path"><span>水中倒影</span><em>›</em><span>左右摇晃</span><em>›</em><span>雨滴晕开</span><em>›</em><span>泡泡变焦</span></div>
+      <ul>
+        <li>水中倒影：垂直位置 <code>0.78</code> 画面高，水波 <code>35</code>，透明度 <code>30</code>，模糊 <code>25</code></li>
+        <li>左右摇晃：幅度 <code>1.5</code>、速度 <code>0.4</code>（再大就成晕船）</li>
+        <li>雨滴晕开：数量 <code>4</code>、大小 <code>70</code>、速度 <code>0.5</code></li>
+        <li>泡泡变焦：放片头，缩短到 <code>0.3–0.5s</code>，缩放 <code>0.85 → 1.0</code></li>
+        <li>音效：弹出终点帧对齐 whoosh 峰值（<b>提前 2 帧起</b>更自然）</li>
+      </ul>
+      <div class="warn"><b>原则：</b>四个特效全部"只调一档"。氛围特效调狠了，画面会糊成一团，反而更廉价。</div>
+    </div>
+
+  </div>
+</section>
+
+<section id="s5" class="rv">
+  <div class="sec-h"><span class="num">05</span><h2>关键帧速查表</h2></div>
+  <p class="sec-sub">全片只有 5 组关键帧。照着这张表打，不会漏。</p>
+
+  <table>
+    <thead><tr><th style="width:110px">时间</th><th style="width:150px">对象</th><th style="width:110px">属性</th><th>起始 → 结束</th><th style="width:120px">缓动</th></tr></thead>
+    <tbody>
+      <tr><td class="num-cell">0.90s</td><td><b>圆形 CD</b></td><td>位置 X</td><td>X0（卡片中心）→ X0 + 直径×0.72</td><td>缓出 / 贝塞尔</td></tr>
+      <tr><td class="num-cell">0.90s</td><td><b>中心圆环贴纸</b></td><td>位置 X</td><td>与 CD 完全一致的数值</td><td>缓出 / 贝塞尔</td></tr>
+      <tr><td class="num-cell">1.70s</td><td><b>圆形 CD</b></td><td>旋转</td><td>0° → 圈数 × 360°</td><td>线性</td></tr>
+      <tr><td class="num-cell">1.70s</td><td><b>播放器 UI</b></td><td>不透明度</td><td>0 → 100</td><td>线性</td></tr>
+      <tr><td class="num-cell">1.65s</td><td><b>音效轨</b></td><td>音量包络</td><td>0 → -12dB → 0（峰值卡终点帧）</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p class="tbl-note">X0 的具体像素值不用记：在时间轴开头把 CD 与封面卡中心对齐，记下当时的 X 值即可。</p>
+</section>
+
+<section id="s6" class="rv">
+  <div class="sec-h"><span class="num">06</span><h2>特效参数速查</h2></div>
+  <p class="sec-sub">"调过头"这一列比建议值更有用——它告诉你该往回拉多少。</p>
+
+  <table>
+    <thead><tr><th style="width:130px">特效</th><th style="width:190px">建议参数</th><th>作用</th><th style="width:190px">调过头会怎样</th></tr></thead>
+    <tbody>
+      <tr><td><b>水中倒影</b></td><td>垂直 0.78 / 水波 35 / 透明 30 / 模糊 25</td><td>把卡片"沉"进水里，画面立刻有纵深</td><td>倒影太清晰 → 像复制了一层，假</td></tr>
+      <tr><td><b>左右摇晃</b></td><td>幅度 1.5 / 速度 0.4</td><td>模拟手持与水面晃动，掩盖静态图的僵硬</td><td>幅度 ≥4 会明显晕，且字幕跟着抖</td></tr>
+      <tr><td><b>雨滴晕开</b></td><td>数量 4 / 大小 70 / 速度 0.5</td><td>提供"正在下雨"的环境叙事</td><td>数量 &gt;8 画面脏，抢主体</td></tr>
+      <tr><td><b>泡泡变焦</b></td><td>0.3–0.5s / 缩放 0.85→1.0</td><td>片头推进，替代生硬的第一帧</td><td>超过 1s 会变成"卡了一下"</td></tr>
+      <tr><td><b>播放器三</b></td><td>纹理 0 / 旋转 0°</td><td>补 UI 骨架，省掉手搭进度条</td><td>纹理 &gt;0 带噪点，与干净画面冲突</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s7" class="rv">
+  <div class="sec-h"><span class="num">07</span><h2>节奏换算：让旋转跟着拍子走</h2></div>
+  <p class="sec-sub">大多数人随便填个 720°，所以看着"不对劲"。唱片转一圈 = 一拍，才是最舒服的。</p>
+
+  <div class="calc">
+    <div>
+      <div class="field"><label>BPM（每分钟拍数）</label><input id="bpm" type="number" value="72" min="40" max="200" step="1"></div>
+      <div class="field"><label>成片时长（秒）</label><input id="dur" type="number" value="15" min="3" max="300" step="1"></div>
+      <div class="field"><label>帧率 fps</label><input id="fps" type="number" value="30" min="24" max="60" step="1"></div>
+    </div>
+    <div class="out">
+      <div class="kv"><span>一拍时长</span><b id="o1">0.833<i>s</i></b></div>
+      <div class="kv"><span>一拍帧数</span><b id="o2">25.0<i>帧</i></b></div>
+      <div class="kv"><span>总圈数</span><b id="o3">18.0<i>圈</i></b></div>
+      <div class="kv"><span>旋转角度</span><b id="o4">6480<i>°</i></b></div>
+      <div class="kv" style="grid-column:1/-1"><span>关键帧建议</span><b style="font-size:13px;line-height:1.5" id="o5">每 2 圈打一帧，共 9 组，全部线性</b></div>
+    </div>
+  </div>
+  <p class="tbl-note">拟真派可以改用黑胶实际转速：33⅓ rpm = 0.556 转/秒，45 rpm = 0.75 转/秒；15 秒分别约 8.3 圈与 11.3 圈。</p>
+</section>
+
+<section id="s8" class="rv">
+  <div class="sec-h"><span class="num">08</span><h2>效果复现</h2></div>
+  <p class="sec-sub">下面按本方案用 CSS/JS 还原了节点顺序与节奏，可反复点"重播"观察。素材用渐变示意，节拍不是原曲。</p>
+
+  <div class="demo-shell">
+    <div class="demo-bar">
+      <div class="tx">图层：背景 60% · 投影 · CD · 圆环 · 封面卡 · 歌词 · UI · 氛围</div>
+      <button class="btn" id="replay">↻ 重播</button>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="bg"></div>
+      <div class="ripples">
+        <i style="--s:38%;--x:58%;--y:52%;--d:0s"></i>
+        <i style="--s:26%;--x:26%;--y:24%;--d:1.6s"></i>
+        <i style="--s:44%;--x:74%;--y:12%;--d:3.1s"></i>
+        <i style="--s:30%;--x:12%;--y:62%;--d:4.4s"></i>
+        <i style="--s:22%;--x:82%;--y:70%;--d:2.4s"></i>
+      </div>
+
+      <div class="zoom">
+        <div class="sway">
+          <div class="ttl">
+            <h4>《寂寞沙洲冷》</h4>
+            <p>— 周传雄</p>
+          </div>
+
+          <div class="obj">
+            <div class="shadow"></div>
+            <div class="cd">
+              <div class="cdsp">
+                <div class="cdart"></div>
+                <div class="groove"></div>
+                <div class="sweep"></div>
+              </div>
+              <div class="ring"></div>
+              <div class="hole"></div>
+            </div>
+            <div class="card"><div class="art"></div></div>
+            <div class="reflect"><div class="rart"></div></div>
+          </div>
+
+          <div class="ly"><div class="ly-in" id="lyin"></div></div>
+
+          <div class="ui">
+            <div class="bar"><div class="barfill"></div></div>
+            <div class="btns">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.3-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.7-7 9-7 9z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6v12"/><path d="M18 6l-8 6 8 6z" fill="currentColor" stroke="none"/></svg>
+              <svg class="play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 6v12"/><path d="M6 6l8 6-8 6z" fill="currentColor" stroke="none"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="demo-foot">
+      <div><span>入场</span><b>泡泡变焦 0.85s</b></div>
+      <div><span>弹出</span><b>0.95s 起 · 位移 72%</b></div>
+      <div><span>旋转</span><b>1.7s 起 · 线性 9s</b></div>
+      <div><span>氛围</span><b>摇晃 + 涟漪 + 倒影</b></div>
+    </div>
+  </div>
+</section>
+
+<section id="s9" class="rv">
+  <div class="sec-h"><span class="num">09</span><h2>常见翻车点</h2></div>
+  <p class="sec-sub">照着做还是不对，九成是下面这几条。</p>
+
+  <div class="faults">
+    <details open><summary>CD 是从封面卡前面弹出来的</summary><div class="body">层级反了。打开「层级 → 全部轨道」，把 CD 拖到封面卡<b>下面</b>。判断方法：静止时 CD 应该完全不可见。</div></details>
+    <details><summary>弹出过程一顿一顿的</summary><div class="body">关键帧缓动是"线性"或中间有多余关键帧。精简成 2 帧，末帧改<b>缓出</b>；如果仍卡，检查是否开了"智能补帧"却只有 24fps 素材。</div></details>
+    <details><summary>圆环和盘面在弹出时错位</summary><div class="body">贴纸的关键帧比 CD 晚了一两帧。把两者的关键帧<b>框选后整体对齐</b>到同一时间点，位移值复制粘贴，别手动拖。</div></details>
+    <details><summary>旋转到一半就停了</summary><div class="body">轨道没拉长，或旋转末尾关键帧落点早于素材结尾。先把所有轨道拉齐到歌词长度，再打旋转末帧。</div></details>
+    <details><summary>旋转速度忽快忽慢</summary><div class="body">单帧角度过大时剪映会自动走"最短路径"。改成<b>每 2 圈一个关键帧</b>并全部线性，能彻底消除跳变。</div></details>
+    <details><summary>歌词抠不干净，边上带绿边</summary><div class="body">色度抠图强度不够或素材压缩产生绿边。强度提到 55–65、阴影 10；仍不行就换「混合模式 → 滤色」直接把黑底去掉。</div></details>
+    <details><summary>整幅画面发灰、没精神</summary><div class="body">背景压到 60% 后必然掉对比。回主轨道加调节：对比度 +10、饱和度 +8、亮度 −5；或叠一层深蓝渐变、混合模式"正片叠底" 15%。</div></details>
+    <details><summary>倒影把 UI 也倒了一遍</summary><div class="body">特效作用对象是"全局"且 UI 层在特效之下。把播放器 UI 轨道移到特效<b>之后</b>（轨道更靠上），或把倒影改成只作用于指定轨道。</div></details>
+    <details><summary>导出后明显变卡 / 掉帧</summary><div class="body">水中倒影 + 雨滴 + 摇晃三层叠加很吃性能。导出前把预览分辨率降到 1/2，或把雨滴特效<b>预渲染</b>成一段素材再叠。</div></details>
+    <details><summary>竖屏版怎么改</summary><div class="body">画布换 1080×1920，卡片缩到高 26%、上移到 y 30%，歌词改为<b>底部横排两行</b>，CD 仍从卡片右侧抽出；其余特效参数不变。</div></details>
+  </div>
+</section>
+
+<footer>
+  <div>音乐播放器 CD 弹出效果 · 完整制作方案</div>
+  <div>参数基于剪映 30fps / 1920×1080 校准 · 可直接套用</div>
+</footer>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var prog = document.getElementById('prog');
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav a'));
+  var sections = navLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+  function onScroll(){
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+    var y = window.scrollY + 120, cur = 0;
+    sections.forEach(function(s, i){ if (s && s.offsetTop <= y) cur = i; });
+    navLinks.forEach(function(a, i){ a.classList.toggle('on', i === cur); });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.08});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  var bpm = document.getElementById('bpm'),
+      dur = document.getElementById('dur'),
+      fps = document.getElementById('fps');
+
+  function calc(){
+    var b = parseFloat(bpm.value) || 72,
+        d = parseFloat(dur.value) || 15,
+        f = parseFloat(fps.value) || 30;
+    var beat = 60 / b;
+    var turns = d * b / 60;
+    var deg = turns * 360;
+    var groups = Math.max(1, Math.ceil(turns / 2));
+    document.getElementById('o1').innerHTML = beat.toFixed(3) + '<i>s</i>';
+    document.getElementById('o2').innerHTML = (beat * f).toFixed(1) + '<i>帧</i>';
+    document.getElementById('o3').innerHTML = turns.toFixed(1) + '<i>圈</i>';
+    document.getElementById('o4').innerHTML = Math.round(deg) + '<i>°</i>';
+    document.getElementById('o5').textContent = '每 2 圈打一帧，共 ' + groups + ' 组，全部线性';
+  }
+  [bpm, dur, fps].forEach(function(el){ el.addEventListener('input', calc); });
+  calc();
+
+  var lines = [
+    '当记忆的线缠绕过往支离破碎',
+    '是慌乱占据了心扉',
+    '有花儿伴着蝴蝶 孤雁可以双飞',
+    '夜深人静独徘徊',
+    '当幸福恋人寄来红色分享喜悦',
+    '闭上双眼难过头也不敢回',
+    '仍然拣尽寒枝不肯安歇',
+    '寂寞沙洲我该思念谁'
+  ];
+  var lyin = document.getElementById('lyin');
+  lines.forEach(function(t){
+    var d = document.createElement('div');
+    d.className = 'ln';
+    d.textContent = t;
+    lyin.appendChild(d);
+  });
+  var items = Array.prototype.slice.call(lyin.children);
+
+  var stage = document.getElementById('stage');
+  var timers = [];
+
+  function sizeStage(){
+    var w = stage.clientWidth;
+    stage.style.setProperty('--u', (w / 100) + 'px');
+  }
+  sizeStage();
+  if (window.ResizeObserver) { new ResizeObserver(function(){ sizeStage(); }).observe(stage); }
+  else { window.addEventListener('resize', sizeStage); }
+
+  function clearTimers(){
+    timers.forEach(function(t){ clearTimeout(t); clearInterval(t); });
+    timers = [];
+  }
+
+  function runLyrics(){
+    var i = 0;
+    items.forEach(function(el){ el.classList.remove('on'); });
+    lyin.style.transform = 'translateY(0)';
+    items[0].classList.add('on');
+    var lh = items[0].offsetHeight || 40;
+    var t = setInterval(function(){
+      i++;
+      if (i > items.length - 5) { clearInterval(t); return; }
+      items[i - 1].classList.remove('on');
+      items[i].classList.add('on');
+      lyin.style.transform = 'translateY(-' + (i * lh) + 'px)';
+    }, 2600);
+    timers.push(t);
+  }
+
+  function play(){
+    clearTimers();
+    stage.classList.remove('play');
+    void stage.offsetWidth;
+    stage.classList.add('play');
+    timers.push(setTimeout(runLyrics, 1200));
+  }
+
+  document.getElementById('replay').addEventListener('click', play);
+
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(play); }
+  else { window.addEventListener('load', play); }
+})();
+</script>
+</body>
+</html>

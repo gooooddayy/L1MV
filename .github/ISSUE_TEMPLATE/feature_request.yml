@@ -1,0 +1,43 @@
+name: 功能建议
+description: 想要的新能力或体验改进
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提之前先看一眼这几条**明确不做**的：4K、云同步/账号、上传、统计埋点、引入框架或构建工具。
+        原因见 [决策记录](https://github.com/gooooddayy/L1MV/blob/main/docs/08-决策记录.md)。
+  - type: textarea
+    id: need
+    attributes:
+      label: 你想解决什么问题
+      description: 先讲场景，别急着讲方案
+      placeholder: 我一首歌要出 5 条不同封面的竖版，现在只能一条条导。
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你希望的用法
+      placeholder: 希望能一次选 5 张封面，按顺序各导一条。
+  - type: dropdown
+    id: area
+    attributes:
+      label: 涉及哪块
+      options:
+        - 导出（格式/分辨率/速度）
+        - 画面与特效
+        - 歌词与字体
+        - 移动端
+        - 兼容性
+        - 文档
+        - 其他
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: 约束确认
+      options:
+        - label: 这个功能不需要联网
+          required: true
+        - label: 这个功能不需要引入第三方库
+          required: true

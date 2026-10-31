@@ -1,0 +1,26 @@
+# 项目数据（本地工作区，不发布）
+.workbuddy/
+
+# 依赖与构建（本项目不用，防误提交）
+node_modules/
+dist/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# 临时文件
+*.log
+*.tmp
+*.bak
+~$*
+
+# 凭据（绝不提交）
+.env
+.env.*
+*.pem
+*.key
+.git-credentials
