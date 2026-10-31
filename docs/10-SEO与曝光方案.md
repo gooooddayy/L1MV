@@ -46,7 +46,7 @@ GitHub 的搜索权重大致是：**仓库名 > description > topics > README �
 | README H1 | `L1MV · 歌词播放器视频生成器` + 副标题含「音乐播放器效果生成」 | ✅ |
 | README 首屏 | 一张图 + 一句话 + 三个徽章，3 秒说清是什么 | ✅ |
 | 截图 | 4 张 JPEG（桌面/竖版输出/手机/社交卡），全部带 alt 文本 | ✅ |
-| 文档 | 12 篇中文技术文档，覆盖长尾技术词 | ✅ |
+| 文档 | 13 篇中文技术文档，覆盖长尾技术词 | ✅ |
 | Releases | 打 tag + 附 HTML 资产，Release 页面独立可索引 | ✅ |
 | Social preview | 1200×630，需在仓库 Settings 手动上传 | ⚠️ 手动 |
 | Issues / Discussions | 开 issue 模板，鼓励提问（每个 issue 都是长尾页面） | ✅ |
