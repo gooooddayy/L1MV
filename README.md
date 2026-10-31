@@ -6,7 +6,7 @@
 
 **歌词播放器视频生成 · 音乐播放器效果生成**
 
-一张封面 + 一段音频 + 一份 LRC 歌词 → 一条带唱片、歌词滚动、光影特效的 MV
+一张封面 + 一段音频 + 一份带时间轴的 LRC 歌词 → 一条带唱片、歌词滚动、光影特效的 歌词MV
 
 [![License](https://img.shields.io/badge/license-MIT-2f6fed)](LICENSE)
 [![Single File](https://img.shields.io/badge/single--file-6.6%20MB-1c8f5f)](播放器视频生成器.html)
