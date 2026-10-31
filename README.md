@@ -28,7 +28,7 @@
 
 | 输入 | 输出 |
 |---|---|
-| 封面图（JPG/PNG/WebP/GIF/BMP/AVIF/SVG）<br>音频（MP3/M4A/AAC/WAV/FLAC/OGG/Opus/WebM，可选）<br>歌词（带时间轴的 LRC，可选） | **MP4**（H.264 + AAC，默认）或 **MOV**<br>720P / 1080P / 2K<br>横版 1920×1080 / 竖版 1080×1920<br>剪映、Premiere、微信、相册都能直接导入 |
+| 封面图（JPG/PNG/WebP/GIF/BMP/AVIF/SVG）<br>音频（MP3/M4A/AAC/WAV/FLAC/OGG/Opus/WebM，可选）<br>歌词（带时间轴的 LRC/TXT，可选） | **MP4**（H.264 + AAC，默认）或 **MOV**<br>720P / 1080P / 2K<br>横版 1920×1080 / 竖版 1080×1920<br>剪映、Premiere、微信、相册都能直接导入 |
 
 > 单文件 6.62 MB，其中 **96% 是内置的 5 款中文字体**（离线、子集化、OFL 授权）；JS 214 KB + CSS 22 KB，剩下的才是界面。
 
