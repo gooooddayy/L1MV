@@ -165,6 +165,8 @@
 | [docs/10-SEO与曝光方案.md](docs/10-SEO与曝光方案.md) | 关键词地图、GitHub 站内 SEO、搜索引擎 SEO、推广渠道 |
 | [docs/11-字体与许可.md](docs/11-字体与许可.md) | 5 款字体的来源、授权、子集化命令 |
 | [docs/12-发布与维护.md](docs/12-发布与维护.md) | 发新版、建 Release、Pages、常见故障 |
+| [docs/13-换电脑恢复清单.md](docs/13-换电脑恢复清单.md) | 空白电脑 10 分钟接上，含「仓库里没有什么」 |
+| [docs/14-版本时间线.md](docs/14-版本时间线.md) | v1→v60 每一版改了什么 |
 | [CHANGELOG.md](CHANGELOG.md) | v1 → v60 的版本演进 |
 
 ---
