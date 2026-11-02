@@ -50,7 +50,7 @@
 ### 想先看效果
 
 在线 Demo：**https://gooooddayy.github.io/L1MV/**
-（托管在 GitHub Pages，部分网络下加载较慢——想马上用，直接下 [Release 里的单文件](https://github.com/gooooddayy/L1MV/releases/latest)。）
+（托管在 GitHub Pages，部分网络下加载较慢——想马上用，直接下 [Release 里的单文件](https://github.com/gooooddayy/L1MV/releases)。）
 
 ---
 
