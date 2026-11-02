@@ -987,6 +987,13 @@ function restoreLiveScale(){
 }
 
 function applyLayout(name){
+  /* 录制中换版式会改 cv.width/height —— 画布尺寸一变，captureStream 的轨道立刻停止产帧，
+     成片就成了「画面定格 + 声音正常」。这里直接挡住，不让它有断轨的机会。 */
+  if(state.recording && state.orient !== name){
+    setStatus('录制中不能切换横竖版（画布尺寸一变，录制轨就断了）：先停止录制再改', 'warn');
+    document.querySelectorAll('input[name=orient]').forEach(r=>{ r.checked = (r.value === state.orient); });
+    return;
+  }
   state.orient = name;
   L = LAYOUTS[name];
   W = L.w; H = L.h;
@@ -2107,6 +2114,7 @@ function refreshPreview(rebuild){
 
 function renderAt(t){
   if(!assets.bg) return;              // 素材还没建好（首帧之前）：不画半成品
+  lastFrameAt = performance.now();    // 录制链路靠它判断「画面还活着没」
   t = clamp(t, 0, state.duration);
   ctx.setTransform(1,0,0,1,0,0);
   /* 每帧整屏重画，所以不需要 clearRect。
@@ -2393,6 +2401,8 @@ audioEl.preload = 'auto';
 let actx=null, srcNode=null, gainPrev=null, destNode=null;
 /* 录制暂停状态：切后台时「录制 + 播放」一起停，回到页面接着录，各段拼起来是一条连续片子 */
 let recPaused = false, pausedAt = 0, recKick = null;
+/* 最后一帧真正画到 canvas 的时刻（ms）。录制期间用它自检「画面是否还在更新」 */
+let lastFrameAt = 0;
 
 function currentTime(){
   if(recPaused) return pausedAt;                 // 录制暂停期间时间轴冻住
@@ -2408,7 +2418,10 @@ function loop(){
     if(state.recording) endRealtime();   // 播完立刻停录，别多录一段尾巴
     return;
   }
-  if(previewVisible) renderAt(t);      // 屏幕外只走时间，不烧 GPU
+  /* 可见性只是「省 GPU」的优化，录制时不能省：画面的唯一产出口就是这里，
+     省掉就成了「画面定格、声音和时长都正常」（v59 的可见性优化引入的回归）。
+     canvas 在视口外照样画得出来，2D 绘制不依赖元素可见性。 */
+  if(previewVisible || state.recording) renderAt(t);
   updateTransport(t);
   rafId = requestAnimationFrame(loop);
 }
@@ -4996,6 +5009,7 @@ function exportRealtime(){
       if(kicked || !state.recording) return;
       if(document.hidden){ pausedAt = 0; recPaused = true; return; }   // 后台不开录，回来再说
       kicked = true;
+      let frameGuardWarned = false;   // 「画面停更」只记一次日志，别把日志环刷爆
       recStartWall = performance.now();
       try{ recorder.start(250); }catch(e){}
       // 录制器要热身 ~0.5s 才真正吃到画面：不等它，开头那 0.5s 的内容就丢了。
@@ -5016,6 +5030,16 @@ function exportRealtime(){
         setBar(step/state.duration*100,
           (recPaused ? '已暂停 ' : '实时录制 ') + fmt(step) + ' / ' + fmt(state.duration)
           + (recPaused ? '' : ' · 还剩 ' + fmt(left)));
+        /* 兜底：录制中若 800ms 没有新帧落到 canvas（rAF 被节流，或以后又加了
+           「屏幕外不重绘」这类闸门），这里强制补一帧。缺帧的成片是「画面定格、
+           声音和时长正常」，肉眼很难第一时间发现 —— 宁可多画这一帧。 */
+        if(recContentStart && !recPaused && performance.now() - lastFrameAt > 800){
+          renderAt(t);
+          if(!frameGuardWarned){
+            frameGuardWarned = true;
+            logWarn('record', '画面停更超过 800ms，已改由录制计时器补帧');
+          }
+        }
         // 必须等内容真正起跑（recContentStart 有值）再判断播完，
         // 否则起跑前那 200ms 里 currentTime 还没基准，会被误判成「已经播到结尾」
         if(recContentStart && !recPaused && !state.playing && step >= state.duration - 0.05) endRealtime();
