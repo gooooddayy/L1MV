@@ -6,10 +6,10 @@
 
 ```bash
 # 通用形式：run.mjs <页面绝对路径> <探针> <headless|window>
-node bench/run.mjs "C:/…/播放器视频生成器.html?debug=1" bench/probes/probe-final.js window
+node bench/run.mjs "C:/…/L1MV.html?debug=1" bench/probes/probe-final.js window
 
 # 手机视口 + CPU 降速 4× + 断网
-MOBILE=1 CPU=4 OFFLINE=1 node bench/run.mjs "C:/…/播放器视频生成器.html" bench/probes/probe-lowend.js window
+MOBILE=1 CPU=4 OFFLINE=1 node bench/run.mjs "C:/…/L1MV.html" bench/probes/probe-lowend.js window
 ```
 
 - `?debug=1` 会挂 `window.__app`（正式打开时不存在）。测试素材由 `bench/seed.js` 注入，探针里调 `__seedDemo(A)`；产物本身不含任何示例素材。

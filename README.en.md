@@ -7,7 +7,7 @@
 **Turn a cover, an audio file and an LRC file into a music-player style video — offline, in one HTML file.**
 
 [![License](https://img.shields.io/badge/license-MIT-2f6fed)](LICENSE)
-[![Single File](https://img.shields.io/badge/single--file-6.6%20MB-1c8f5f)](播放器视频生成器.html)
+[![Single File](https://img.shields.io/badge/single--file-6.6%20MB-1c8f5f)](L1MV.html)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-1c8f5f)](#how-it-works)
 [![Offline](https://img.shields.io/badge/offline-100%25-1c8f5f)](#faq)
 

@@ -9,7 +9,7 @@
 一张封面 + 一段音频 + 一份带时间轴的 LRC 歌词 → 一条带唱片、歌词滚动、光影特效的 歌词MV
 
 [![License](https://img.shields.io/badge/license-MIT-2f6fed)](LICENSE)
-[![Single File](https://img.shields.io/badge/single--file-6.6%20MB-1c8f5f)](播放器视频生成器.html)
+[![Single File](https://img.shields.io/badge/single--file-6.6%20MB-1c8f5f)](L1MV.html)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-1c8f5f)](#技术亮点)
 [![Offline](https://img.shields.io/badge/offline-100%25-1c8f5f)](#常见问题)
 [![WebCodecs](https://img.shields.io/badge/WebCodecs-H.264%20%2B%20AAC-2f6fed)](docs/03-导出链路.md)
@@ -38,7 +38,7 @@
 
 ### 电脑（推荐 Chrome / Edge）
 
-1. 下载 [`播放器视频生成器.html`](播放器视频生成器.html)（右上角 **Download raw file**，或从 [Releases](https://github.com/gooooddayy/L1MV/releases) 下载）。
+1. 下载 [`L1MV.html`](L1MV.html)（右上角 **Download raw file**，或从 [Releases](https://github.com/gooooddayy/L1MV/releases) 下载）。
 2. **双击打开**（`file://` 即可，不用起服务器）。
 3. 拖入封面 → 拖入音频 → 拖入/粘贴歌词 → 点「导出视频」。
 4. 快速编码约 **1.3–2.3× 速**（10 秒片约 2–11 秒出片）；兼容录制约 1× 速，但兼容性最好。

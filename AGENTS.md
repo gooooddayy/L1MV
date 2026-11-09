@@ -9,7 +9,7 @@
 **L1MV 歌词播放器视频生成器** —— 一个 6.6 MB 的单文件网页工具。
 输入：封面图 + 音频 + LRC 歌词。输出：720P/1080P/2K、横版/竖版的 MP4（H.264+AAC）或 MOV（H.264+PCM）。
 
-唯一产物：[`播放器视频生成器.html`](播放器视频生成器.html)。双击即用，`file://` 可跑。
+唯一产物：[`L1MV.html`](L1MV.html)。双击即用，`file://` 可跑。
 
 ## 不可违反的约束
 
@@ -57,13 +57,13 @@
 
 ```bash
 # 导出冒烟（720P / 1080P / 录制）
-node bench/run.mjs "C:/…/播放器视频生成器.html?debug=1" bench/probes/probe-final.js window
+node bench/run.mjs "C:/…/L1MV.html?debug=1" bench/probes/probe-final.js window
 
 # 布局 / CLS / 点击目标
-node bench/run.mjs "C:/…/播放器视频生成器.html" bench/probes/probe-audit.js window
+node bench/run.mjs "C:/…/L1MV.html" bench/probes/probe-audit.js window
 
 # 手机视口
-MOBILE=1 node bench/run.mjs "C:/…/播放器视频生成器.html" bench/probes/probe-nav.js window
+MOBILE=1 node bench/run.mjs "C:/…/L1MV.html" bench/probes/probe-nav.js window
 ```
 
 驱动里的 `EDGE` 常量写死了 Windows 的 Edge 路径，换机器改一行。
